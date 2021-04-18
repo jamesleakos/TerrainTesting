@@ -167,8 +167,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spacing: 1
-  xSize: 5
-  zSize: 5
+  xSize: 30
+  zSize: 30
 --- !u!23 &96882140
 MeshRenderer:
   m_ObjectHideFlags: 0

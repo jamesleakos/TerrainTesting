@@ -8,10 +8,8 @@ using System.Linq;
 public class HexMeshGenerator : MonoBehaviour
 {
     Mesh mesh;
-
+    MeshMaterials meshMaterials = new MeshMaterials();
     List<LandTile> landTiles = new List<LandTile>();
-    List<Vector3> vertices = new List<Vector3>();
-    List<int> triangles = new List<int>();
 
     // how far apart the tiles are
     public float spacing = 1.0f;
@@ -34,7 +32,7 @@ public class HexMeshGenerator : MonoBehaviour
 
     private void Update()
     {
-        //UpdateMesh();
+        UpdateMesh();
     }
 
     void CreateShape()
@@ -50,13 +48,13 @@ public class HexMeshGenerator : MonoBehaviour
                 landTile.row = z;
 
                 // calculate center of the landtile
-                //float y = Mathf.PerlinNoise(x * .3f, z * .3f) * 4f;
-                float y = 0;
+                float y = Mathf.PerlinNoise(x * .3f, z * .3f) * 4f;
+                //float y = 0;
                 landTile.center = new Vector3(x * spacing + spacing * (z % 2 == 0 ? 0f : 0.5f), y, z * 0.5f * spacing * Mathf.Sqrt(3));
                 
                 // calculate vertices, save them in landtile, and add them to the vertex list;
                 landTile.GenerateInnerHexVertices(spacing);
-                foreach (var v in landTile.innerHexVertices) vertices.Add(v);
+                //foreach (var v in landTile.innerHexVertices) vertices.Add(v);
 
                 landTiles.Add(landTile);
                 index++;
@@ -68,10 +66,10 @@ public class HexMeshGenerator : MonoBehaviour
             landTile.CalculateNeighbors(landTiles, xSize);
         }
 
+        var coveredTiles = new List<LandTile>();
         foreach (var landTile in landTiles)
         {
-            triangles = landTile.AddTriangles(triangles);
-            Debug.Log("Better check to make sure this whole reference type this works");
+            meshMaterials = landTile.AddTriangles(meshMaterials, coveredTiles);
         }
     }
 
@@ -79,8 +77,8 @@ public class HexMeshGenerator : MonoBehaviour
     {
         mesh.Clear();
 
-        mesh.vertices = vertices.ToArray();
-        mesh.triangles = triangles.ToArray();
+        mesh.vertices = meshMaterials.vertices.ToArray();
+        mesh.triangles = meshMaterials.triangles.ToArray();
 
         mesh.RecalculateNormals();
     }
@@ -176,15 +174,57 @@ public class LandTile
             }
             neighbor.landTile = n;
             neighbor.exists = n != null;
+            neighbors.Add(neighbor);
         }
     }
 
-    public List<int> AddTriangles (List<int> triangles)
+    public MeshMaterials AddTriangles (MeshMaterials meshMaterials, List<LandTile> coveredTiles)
     {
+        coveredTiles.Add(this);
+
+        // add interior triangles
+        meshMaterials = AddSingleTriangle(meshMaterials, innerHexVertices[0], innerHexVertices[1], innerHexVertices[2]);
+        meshMaterials = AddSingleTriangle(meshMaterials, innerHexVertices[0], innerHexVertices[2], innerHexVertices[5]);
+        meshMaterials = AddSingleTriangle(meshMaterials, innerHexVertices[5], innerHexVertices[2], innerHexVertices[3]);
+        meshMaterials = AddSingleTriangle(meshMaterials, innerHexVertices[5], innerHexVertices[3], innerHexVertices[4]);
 
 
+        for (int i = 0; i < 6; i++)
+        {
+            // add neighbor box
+            if (neighbors[i].exists && !coveredTiles.Contains(neighbors[i].landTile)) {
+                meshMaterials = AddSingleTriangle(meshMaterials, GetVertex((0 + i) % 6), neighbors[i].landTile.GetVertex((4 + i) % 6), GetVertex((1 + i) % 6));
+                meshMaterials = AddSingleTriangle(meshMaterials, GetVertex((1 + i) % 6), neighbors[i].landTile.GetVertex((4 + i) % 6), neighbors[i].landTile.GetVertex((3 + i) % 6));
+            }
+            // add thruple triangle
+            if (neighbors[i].exists && !coveredTiles.Contains(neighbors[i].landTile) && neighbors[Mod(i - 1, 6)].exists && !coveredTiles.Contains(neighbors[Mod(i - 1, 6)].landTile))
+            {
+                meshMaterials = AddSingleTriangle(meshMaterials, GetVertex((0 + i) % 6), neighbors[Mod(i - 1, 6)].landTile.GetVertex((2 + i) % 6), neighbors[(0 + i) % 6].landTile.GetVertex((4 + i) % 6));
+            }
+        }
 
-        return triangles;
+        return meshMaterials;
+    }
+
+    public MeshMaterials AddSingleTriangle (MeshMaterials meshMaterials, Vector3 one, Vector3 two, Vector3 three)
+    {
+        meshMaterials.vertices.Add(one);
+        meshMaterials.triangles.Add(meshMaterials.vertices.Count - 1);
+
+        meshMaterials.vertices.Add(two);
+        meshMaterials.triangles.Add(meshMaterials.vertices.Count - 1);
+
+        meshMaterials.vertices.Add(three);
+        meshMaterials.triangles.Add(meshMaterials.vertices.Count - 1);
+
+        return meshMaterials;
+    }
+    public Vector3 GetVertex(int localVertex) {
+        return innerHexVertices[localVertex]; 
+    }
+    int Mod(int x, int m)
+    {
+        return (x % m + m) % m;
     }
 }
 
@@ -195,4 +235,10 @@ public class LandTileNeighbor
     public LandTile landTile;
     
 
+}
+
+public class MeshMaterials
+{
+    public List<int> triangles = new List<int>();
+    public List<Vector3> vertices = new List<Vector3>();
 }
