@@ -27,12 +27,12 @@ public class HexMeshGenerator : MonoBehaviour
         CreateShape();
 
         // more efficient to do it here, but in update we can see them be generated
-        //UpdateMesh();
+        UpdateMesh();
     }
 
     private void Update()
     {
-        UpdateMesh();
+        //UpdateMesh();
     }
 
     void CreateShape()
