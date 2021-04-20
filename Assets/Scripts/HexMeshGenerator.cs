@@ -10,12 +10,18 @@ public class HexMeshGenerator : MonoBehaviour
     Mesh mesh;
     MeshMaterials meshMaterials = new MeshMaterials();
     List<LandTile> landTiles = new List<LandTile>();
+    List<WorldTile> worldTiles = new List<WorldTile>();
 
     // how far apart the tiles are
     public float spacing = 1.0f;
 
     public int xSize = 5;
     public int zSize = 5;
+
+    public GameObject worldTilePrefab;
+    public WorldTile selectedTile;
+
+    public float heightAdjustment = 1f;
 
 
     // Start is called before the first frame update
@@ -24,18 +30,46 @@ public class HexMeshGenerator : MonoBehaviour
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
 
-        CreateShape();
+        CreateLandTiles();
 
         // more efficient to do it here, but in update we can see them be generated
+        GenerateTriangles();
         UpdateMesh();
+
+        GenerateHexColliders();
     }
 
     private void Update()
     {
-        //UpdateMesh();
+        GetAdjustmentInput();
     }
 
-    void CreateShape()
+    void GetAdjustmentInput()
+    {
+        if ((Input.GetKeyDown("f") || Input.GetKeyDown("c")) && selectedTile != null)
+        {
+            Debug.Log("triggered");
+            float adjustment = 0f;
+            if (Input.GetKeyDown("f"))
+            {
+                adjustment = heightAdjustment;
+            }
+            if (Input.GetKeyDown("c"))
+            {
+                adjustment = heightAdjustment * -1;
+            }
+            var landTile = landTiles.Find(c => c.id == selectedTile.id);
+            Vector3 pos = landTile.center;
+            pos.y += adjustment;
+            landTile.center = pos;
+            selectedTile.transform.position = pos;
+
+            GenerateTriangles();
+            UpdateMesh();
+        }        
+    }
+
+    void CreateLandTiles()
     {
 
         int index = 0;
@@ -65,6 +99,12 @@ public class HexMeshGenerator : MonoBehaviour
         {
             landTile.CalculateNeighbors(landTiles, xSize);
         }
+    }
+
+    void GenerateTriangles()
+    {
+        meshMaterials.triangles.Clear();
+        meshMaterials.vertices.Clear();
 
         var coveredTiles = new List<LandTile>();
         foreach (var landTile in landTiles)
@@ -81,6 +121,23 @@ public class HexMeshGenerator : MonoBehaviour
         mesh.triangles = meshMaterials.triangles.ToArray();
 
         mesh.RecalculateNormals();
+    }
+
+    void GenerateHexColliders()
+    {
+        foreach (var landTile in landTiles)
+        {
+            var newTile = Instantiate(worldTilePrefab, landTile.center, new Quaternion (0,0,0,0));
+            var newWorldTile = newTile.GetComponent<WorldTile>();
+            newWorldTile.id = landTile.id;
+            newWorldTile.gen = this;
+            worldTiles.Add(newWorldTile);            
+        }
+    }
+
+    public void SelectWorldTile (int id)
+    {
+        selectedTile = worldTiles.Find(c => c.id == id);
     }
 
 
