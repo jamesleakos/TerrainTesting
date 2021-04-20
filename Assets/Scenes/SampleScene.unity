@@ -167,11 +167,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 508ddacf3305b864bb83392c0ab27676, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spacing: 1
   xSize: 10
   zSize: 10
+  spacing: 1
+  innerHexProportion: 0.42
   worldTilePrefab: {fileID: 346448217753704457, guid: e1fe118689d66914aa3f93bfa7ef28b2,
     type: 3}
+  heightAdjustment: 0.1
 --- !u!23 &96882140
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -423,7 +425,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   panSpeed: 10
   scrollSpeed: 2
-  minY: 5
-  maxY: 15
   rotateSpeed: 60
   lookAhead: 4
+  minY: 5
+  maxY: 15

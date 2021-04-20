@@ -12,15 +12,21 @@ public class HexMeshGenerator : MonoBehaviour
     List<LandTile> landTiles = new List<LandTile>();
     List<WorldTile> worldTiles = new List<WorldTile>();
 
-    // how far apart the tiles are
-    public float spacing = 1.0f;
-
+    [Header("Grid Size")]
     public int xSize = 5;
     public int zSize = 5;
 
-    public GameObject worldTilePrefab;
-    public WorldTile selectedTile;
+    [Header("Tile Attributes")]
+    // how far apart the tiles are
+    public float spacing = 1.0f;
+    [Range(0, 1)]
+    public float innerHexProportion = 0.5f;
 
+    [Header("Prefabs")]
+    public GameObject worldTilePrefab;
+    WorldTile selectedTile;
+
+    [Header("Adjusting the Mesh")]
     public float heightAdjustment = 1f;
 
 
@@ -48,7 +54,6 @@ public class HexMeshGenerator : MonoBehaviour
     {
         if ((Input.GetKeyDown("f") || Input.GetKeyDown("c")) && selectedTile != null)
         {
-            Debug.Log("triggered");
             float adjustment = 0f;
             if (Input.GetKeyDown("f"))
             {
@@ -62,6 +67,7 @@ public class HexMeshGenerator : MonoBehaviour
             Vector3 pos = landTile.center;
             pos.y += adjustment;
             landTile.center = pos;
+            landTile.GenerateInnerHexVertices(spacing);
             selectedTile.transform.position = pos;
 
             GenerateTriangles();
@@ -80,9 +86,10 @@ public class HexMeshGenerator : MonoBehaviour
                 LandTile landTile = new LandTile();
                 landTile.id = index;
                 landTile.row = z;
+                landTile.innerHexProportion = innerHexProportion;
 
                 // calculate center of the landtile
-                float y = Mathf.PerlinNoise(x * .3f, z * .3f) * 4f;
+                float y = Mathf.PerlinNoise(x * .3f, z * .3f) * 2f;
                 //float y = 0;
                 landTile.center = new Vector3(x * spacing + spacing * (z % 2 == 0 ? 0f : 0.5f), y, z * 0.5f * spacing * Mathf.Sqrt(3));
                 
@@ -186,6 +193,7 @@ public class LandTile
 
     public void GenerateInnerHexVertices(float spacing)
     {
+        innerHexVertices.Clear();
         float innerApothem = innerHexProportion * spacing * 0.5f;
         float radius = innerApothem * 2f / Mathf.Sqrt(3);
         for (int i = 0; i < 6; i++)
@@ -197,6 +205,7 @@ public class LandTile
 
     public void CalculateNeighbors (List<LandTile> landTiles, int xSize)
     {
+        neighbors.Clear();
         for (int i = 0; i < 6; i++)
         {
             LandTileNeighbor neighbor = new LandTileNeighbor();

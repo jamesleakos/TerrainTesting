@@ -2,20 +2,24 @@
 
 public class CameraController : MonoBehaviour
 {
+    [Header("Movement")]
     // Button Movement Input Vars
     public float panSpeed = 20;
     public float scrollSpeed = 20;
-    public float minY = 5f;
-    public float maxY = 30f;
 
     // Mouse Movement Input Vars
     private Vector3 dragOrigin;
     private Vector3 cameraDragOrigin;
     private Vector3 currentPosition;
 
+    [Header("Rotation")]
     // Button Rotation Vars
     public float rotateSpeed = 40;
     public float lookAhead = 2f;
+
+    [Header("Camera Bounds")]
+    public float minY = 5f;
+    public float maxY = 30f;
 
     void Update()
     {

@@ -23,7 +23,7 @@ public class SaveMeshInEditor : MonoBehaviour
         var mf = gameObject.GetComponent<MeshFilter>();
         if (mf)
         {
-            var savePath = "Assets/" + saveName + ".asset";
+            var savePath = "Assets/SavedMeshes/" + saveName + ".asset";
             Debug.Log("Saved Mesh to:" + savePath);
             AssetDatabase.CreateAsset(mf.mesh, savePath);
         }
