@@ -272,6 +272,35 @@ public class LandTile
         return meshMaterials;
     }
 
+    public MeshMaterials ComplexAddTriangles(MeshMaterials meshMaterials, List<LandTile> coveredTiles)
+    {
+        coveredTiles.Add(this);
+
+        // add interior triangles
+        meshMaterials = AddSingleTriangle(meshMaterials, innerHexVertices[0], innerHexVertices[1], innerHexVertices[2]);
+        meshMaterials = AddSingleTriangle(meshMaterials, innerHexVertices[0], innerHexVertices[2], innerHexVertices[5]);
+        meshMaterials = AddSingleTriangle(meshMaterials, innerHexVertices[5], innerHexVertices[2], innerHexVertices[3]);
+        meshMaterials = AddSingleTriangle(meshMaterials, innerHexVertices[5], innerHexVertices[3], innerHexVertices[4]);
+
+
+        for (int i = 0; i < 6; i++)
+        {
+            // add neighbor box
+            if (neighbors[i].exists && !coveredTiles.Contains(neighbors[i].landTile))
+            {
+                meshMaterials = AddSingleTriangle(meshMaterials, GetVertex((0 + i) % 6), neighbors[i].landTile.GetVertex((4 + i) % 6), GetVertex((1 + i) % 6));
+                meshMaterials = AddSingleTriangle(meshMaterials, GetVertex((1 + i) % 6), neighbors[i].landTile.GetVertex((4 + i) % 6), neighbors[i].landTile.GetVertex((3 + i) % 6));
+            }
+            // add thruple triangle
+            if (neighbors[i].exists && !coveredTiles.Contains(neighbors[i].landTile) && neighbors[Mod(i - 1, 6)].exists && !coveredTiles.Contains(neighbors[Mod(i - 1, 6)].landTile))
+            {
+                meshMaterials = AddSingleTriangle(meshMaterials, GetVertex((0 + i) % 6), neighbors[Mod(i - 1, 6)].landTile.GetVertex((2 + i) % 6), neighbors[(0 + i) % 6].landTile.GetVertex((4 + i) % 6));
+            }
+        }
+
+        return meshMaterials;
+    }
+
     public MeshMaterials AddSingleTriangle (MeshMaterials meshMaterials, Vector3 one, Vector3 two, Vector3 three)
     {
         meshMaterials.vertices.Add(one);
