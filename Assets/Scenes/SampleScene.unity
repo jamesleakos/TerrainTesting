@@ -171,6 +171,13 @@ MonoBehaviour:
   zSize: 10
   spacing: 1
   innerHexProportion: 0.42
+  usePerlin: 1
+  perlinMultiplier: 2
+  useComplexMesh: 0
+  useRandomBoxHeight: 1
+  useRandomBoxPosition: 1
+  useRandomThrupleHeight: 1
+  useRandomThruplePosition: 1
   worldTilePrefab: {fileID: 346448217753704457, guid: e1fe118689d66914aa3f93bfa7ef28b2,
     type: 3}
   heightAdjustment: 0.1
@@ -425,7 +432,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   panSpeed: 10
   scrollSpeed: 2
-  rotateSpeed: 60
+  rotateSpeed: 120
   lookAhead: 4
   minY: 5
-  maxY: 15
+  maxY: 40

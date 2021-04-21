@@ -21,6 +21,16 @@ public class HexMeshGenerator : MonoBehaviour
     public float spacing = 1.0f;
     [Range(0, 1)]
     public float innerHexProportion = 0.5f;
+    public bool usePerlin;
+    [Range(1, 20)]
+    public float perlinMultiplier;
+
+    [Header("Complex Mesh Settings")]
+    public bool useComplexMesh;
+    public bool useRandomBoxHeight;
+    public bool useRandomBoxPosition;
+    public bool useRandomThrupleHeight;
+    public bool useRandomThruplePosition;
 
     [Header("Prefabs")]
     public GameObject worldTilePrefab;
@@ -83,19 +93,24 @@ public class HexMeshGenerator : MonoBehaviour
         {
             for (int x = 0; x < xSize; x++)
             {
-                LandTile landTile = new LandTile();
-                landTile.id = index;
-                landTile.row = z;
-                landTile.innerHexProportion = innerHexProportion;
-
                 // calculate center of the landtile
-                float y = Mathf.PerlinNoise(x * .3f, z * .3f) * 2f;
-                //float y = 0;
-                landTile.center = new Vector3(x * spacing + spacing * (z % 2 == 0 ? 0f : 0.5f), y, z * 0.5f * spacing * Mathf.Sqrt(3));
-                
-                // calculate vertices, save them in landtile, and add them to the vertex list;
-                landTile.GenerateInnerHexVertices(spacing);
-                //foreach (var v in landTile.innerHexVertices) vertices.Add(v);
+                // y height
+                float y;
+                if (usePerlin) y = Mathf.PerlinNoise(x * .3f, z * .3f) * perlinMultiplier;
+                else y = 0;
+
+                LandTile landTile = new LandTile(
+                    index,
+                    new Vector3(x * spacing + spacing * (z % 2 == 0 ? 0f : 0.5f), y, z * 0.5f * spacing * Mathf.Sqrt(3)),
+                    z,
+                    innerHexProportion,
+                    useComplexMesh,
+                    useRandomBoxHeight,
+                    useRandomBoxPosition,
+                    useRandomThrupleHeight,
+                    useRandomThruplePosition,
+                    spacing
+                );
 
                 landTiles.Add(landTile);
                 index++;
@@ -116,7 +131,8 @@ public class HexMeshGenerator : MonoBehaviour
         var coveredTiles = new List<LandTile>();
         foreach (var landTile in landTiles)
         {
-            meshMaterials = landTile.AddTriangles(meshMaterials, coveredTiles);
+            if (useComplexMesh) meshMaterials = landTile.ComplexAddTriangles(meshMaterials, coveredTiles);
+            else meshMaterials = landTile.AddTriangles(meshMaterials, coveredTiles);
         }
     }
 
@@ -188,8 +204,30 @@ public class LandTile
     public int row;
     public float innerHexProportion = 0.7f;
 
+    public bool useComplexMesh;
+    public bool useRandomBoxHeight;
+    public bool useRandomBoxPosition;
+    public bool useRandomThrupleHeight;
+    public bool useRandomThruplePosition;
+
     public List<Vector3> innerHexVertices = new List<Vector3>();
     public List<LandTileNeighbor> neighbors = new List<LandTileNeighbor>();
+
+    public LandTile (int id, Vector3 center, int row, float innerHexProportion, bool useComplexMesh, bool useRandomBoxHeight,
+        bool useRandomBoxPosition, bool useRandomThrupleHeight, bool useRandomThruplePosition, float spacing)
+    {
+        this.id = id;
+        this.center = center;
+        this.row = row;
+        this.innerHexProportion = innerHexProportion;
+        this.useComplexMesh = useComplexMesh;
+        this.useRandomBoxHeight = useRandomBoxHeight;
+        this.useRandomBoxPosition = useRandomBoxPosition;
+        this.useRandomThrupleHeight = useRandomThrupleHeight;
+        this.useRandomThruplePosition = useRandomThruplePosition;
+
+        GenerateInnerHexVertices(spacing);
+    }
 
     public void GenerateInnerHexVertices(float spacing)
     {
@@ -288,13 +326,71 @@ public class LandTile
             // add neighbor box
             if (neighbors[i].exists && !coveredTiles.Contains(neighbors[i].landTile))
             {
-                meshMaterials = AddSingleTriangle(meshMaterials, GetVertex((0 + i) % 6), neighbors[i].landTile.GetVertex((4 + i) % 6), GetVertex((1 + i) % 6));
-                meshMaterials = AddSingleTriangle(meshMaterials, GetVertex((1 + i) % 6), neighbors[i].landTile.GetVertex((4 + i) % 6), neighbors[i].landTile.GetVertex((3 + i) % 6));
+                // place vertex
+                Vector3 boxVertex = new Vector3 (0,0,0);
+
+                // determine height
+                if (useRandomBoxHeight) { boxVertex.y = Random.Range(Mathf.Min(center.y, neighbors[i].landTile.center.y), Mathf.Max(center.y, neighbors[i].landTile.center.y)); }
+                else boxVertex.y = (center.y + neighbors[i].landTile.center.y) / 2;
+
+                //determine pos in box
+                if (useRandomBoxPosition)
+                {
+                    Vector2 result = GetVertexInSquare(
+                        new Vector2 (GetVertex((0 + i) % 6).x, GetVertex((0 + i) % 6).z),
+                        new Vector2(neighbors[i].landTile.GetVertex((4 + i) % 6).x, neighbors[i].landTile.GetVertex((4 + i) % 6).z),
+                        new Vector2(neighbors[i].landTile.GetVertex((3 + i) % 6).x, neighbors[i].landTile.GetVertex((3 + i) % 6).z),
+                        new Vector2(GetVertex((1 + i) % 6).x, GetVertex((1 + i) % 6).z)
+                    );
+                    boxVertex.x = result.x;
+                    boxVertex.z = result.y; // y is not a mistake here
+                }
+                else
+                {
+                    boxVertex.x = (GetVertex((0 + i) % 6).x + neighbors[i].landTile.GetVertex((3 + i) % 6).x) / 2;
+                    boxVertex.z = (GetVertex((0 + i) % 6).z + neighbors[i].landTile.GetVertex((3 + i) % 6).z) / 2;
+                }
+
+                // draw the triangles based on the vertex
+                meshMaterials = AddSingleTriangle(meshMaterials, GetVertex((0 + i) % 6), boxVertex, GetVertex((1 + i) % 6));
+                meshMaterials = AddSingleTriangle(meshMaterials, GetVertex((0 + i) % 6), neighbors[i].landTile.GetVertex((4 + i) % 6), boxVertex);
+                meshMaterials = AddSingleTriangle(meshMaterials, boxVertex, neighbors[i].landTile.GetVertex((4 + i) % 6), neighbors[i].landTile.GetVertex((3 + i) % 6));
+                meshMaterials = AddSingleTriangle(meshMaterials, boxVertex, neighbors[i].landTile.GetVertex((3 + i) % 6), GetVertex((1 + i) % 6));
             }
+
             // add thruple triangle
             if (neighbors[i].exists && !coveredTiles.Contains(neighbors[i].landTile) && neighbors[Mod(i - 1, 6)].exists && !coveredTiles.Contains(neighbors[Mod(i - 1, 6)].landTile))
             {
-                meshMaterials = AddSingleTriangle(meshMaterials, GetVertex((0 + i) % 6), neighbors[Mod(i - 1, 6)].landTile.GetVertex((2 + i) % 6), neighbors[(0 + i) % 6].landTile.GetVertex((4 + i) % 6));
+                // place vertex
+                Vector3 triVertex = new Vector3(0, 0, 0);
+
+                // determine height
+                if (useRandomThrupleHeight) { triVertex.y = Random.Range(Mathf.Min(center.y, neighbors[i].landTile.center.y, neighbors[Mod(i - 1, 6)].landTile.center.y), 
+                    Mathf.Max(center.y, neighbors[i].landTile.center.y, neighbors[Mod(i - 1, 6)].landTile.center.y)); }
+                else triVertex.y = (center.y + neighbors[i].landTile.center.y + neighbors[Mod(i - 1, 6)].landTile.center.y) / 3;
+
+                //determine pos in triangle
+                if (useRandomThruplePosition)
+                {
+                    Vector2 result = GetVertexInTriangle(
+                        new Vector2(GetVertex((0 + i) % 6).x, GetVertex((0 + i) % 6).z),
+                        new Vector2(neighbors[Mod(i - 1, 6)].landTile.GetVertex((2 + i) % 6).x, neighbors[Mod(i - 1, 6)].landTile.GetVertex((2 + i) % 6).z),
+                        new Vector2(neighbors[i].landTile.GetVertex((4 + i) % 6).x, neighbors[i].landTile.GetVertex((4 + i) % 6).z)
+                    );
+                    triVertex.x = result.x;
+                    triVertex.z = result.y; // y is not a mistake here
+                }
+                else
+                {
+                    // this is quite wrong actually
+                    triVertex.x = (GetVertex((0 + i) % 6).x + neighbors[i].landTile.GetVertex((4 + i) % 6).x + neighbors[Mod(i - 1, 6)].landTile.GetVertex((2 + i) % 6).x) / 3;
+                    triVertex.z = (GetVertex((0 + i) % 6).z + neighbors[i].landTile.GetVertex((4 + i) % 6).z + neighbors[Mod(i - 1, 6)].landTile.GetVertex((2 + i) % 6).z) / 3;
+                }
+
+                // draw the triangles based on the vertex
+                meshMaterials = AddSingleTriangle(meshMaterials, triVertex, GetVertex((0 + i) % 6), neighbors[(0 + i) % 6].landTile.GetVertex((2 + i) % 6));
+                meshMaterials = AddSingleTriangle(meshMaterials, triVertex, neighbors[Mod(i - 1, 6)].landTile.GetVertex((2 + i) % 6), neighbors[i].landTile.GetVertex((4 + i) % 6));
+                meshMaterials = AddSingleTriangle(meshMaterials, triVertex, neighbors[i].landTile.GetVertex((4 + i) % 6), GetVertex((0 + i) % 6));
             }
         }
 
@@ -314,13 +410,38 @@ public class LandTile
 
         return meshMaterials;
     }
-    public Vector3 GetVertex(int localVertex) {
-        return innerHexVertices[localVertex]; 
+
+    #region Utilities
+
+    public Vector3 GetVertex(int localVertex)
+    {
+        return innerHexVertices[localVertex];
     }
     int Mod(int x, int m)
     {
         return (x % m + m) % m;
     }
+    Vector2 GetVertexInTriangle(Vector2 a, Vector2 b, Vector2 c)
+    {
+        float r1 = Random.Range(0f, 1f);
+        float r2 = Random.Range(0f, 1f);
+
+        Vector2 result = (1f - Mathf.Sqrt(r1)) * a + (Mathf.Sqrt(r1) * (1 - r2)) * b + (Mathf.Sqrt(r1) * r2) * c;
+        return result;
+    }
+    Vector2 GetVertexInSquare(Vector2 a, Vector2 b, Vector2 c, Vector2 d)
+    {
+        if (coinflip()) return GetVertexInTriangle(a, b, d);
+        else return GetVertexInTriangle(b, c, d);
+    }
+    bool coinflip()
+    {
+        float coin = Random.Range(0f, 1f);
+        return coin < 0.5f;
+    }
+
+    #endregion
+
 }
 
 public class LandTileNeighbor
