@@ -7,6 +7,8 @@ using System.Linq;
 
 public class HexMeshGenerator : MonoBehaviour
 {
+    #region Variables
+
     Mesh mesh;
     MeshMaterials meshMaterials = new MeshMaterials();
     List<LandTile> landTiles = new List<LandTile>();
@@ -39,7 +41,8 @@ public class HexMeshGenerator : MonoBehaviour
     [Header("Adjusting the Mesh")]
     public float heightAdjustment = 1f;
 
-
+    #endregion
+         
     // Start is called before the first frame update
     void Start()
     {
@@ -194,8 +197,6 @@ public class HexMeshGenerator : MonoBehaviour
 
     #endregion
 }
-
-
 
 public class LandTile
 {
