@@ -8,9 +8,8 @@ public class CameraController : MonoBehaviour
     public float scrollSpeed = 20;
 
     // Mouse Movement Input Vars
-    private Vector3 dragOrigin;
-    private Vector3 cameraDragOrigin;
-    private Vector3 currentPosition;
+    Vector3 lastMousePosition;
+    public float dragSpeed = 0.01f;
 
     [Header("Rotation")]
     // Button Rotation Vars
@@ -25,7 +24,7 @@ public class CameraController : MonoBehaviour
     {
         ButtonMovementInputs();
         ButtonRotationInputs();
-        //MouseInputs();
+        MouseInputs();
         ZoomCamera();
     }
 
@@ -43,20 +42,15 @@ public class CameraController : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            cameraDragOrigin = transform.position;
-            dragOrigin = Camera.main.ScreenToViewportPoint(Input.mousePosition);
+            lastMousePosition = Input.mousePosition;
         }
-
-        if (Input.GetMouseButton(0))
+        else if (Input.GetMouseButton(0))
         {
-            Vector3 pos = Camera.main.ScreenToViewportPoint(Input.mousePosition) - dragOrigin;
-            Vector3 desirePos = cameraDragOrigin + -1 * new Vector3 (pos.x, 0, pos.y) * panSpeed;
-            Vector3 move = desirePos - transform.position;
-            MoveCamera(move.x, move.z);
-        }
+            Vector3 delta = Input.mousePosition - lastMousePosition;
 
-        if (Input.GetMouseButtonUp(0))
-        {
+            MoveCamera(-1 * dragSpeed * delta.x, -1 * dragSpeed * delta.y);
+
+            lastMousePosition = Input.mousePosition;
         }
     }
 

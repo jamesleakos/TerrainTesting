@@ -12,7 +12,7 @@ public class HexMeshGenerator : MonoBehaviour
     Mesh mesh;
     MeshMaterials meshMaterials = new MeshMaterials();
     List<LandTile> landTiles = new List<LandTile>();
-    List<WorldTile> worldTiles = new List<WorldTile>();
+    List<WorldTile> worldTiles = new List<WorldTile>();    
 
     [Header("Grid Size")]
     public int xSize = 5;
@@ -40,9 +40,17 @@ public class HexMeshGenerator : MonoBehaviour
 
     [Header("Adjusting the Mesh")]
     public float heightAdjustment = 1f;
+    public bool editMode;
+
+    [Header("Mesh Color")]
+    Color[] colors;
+    public Gradient gradient;
+    float minTerrainHeight;
+    float maxTerrainHeight;
+
 
     #endregion
-         
+
     // Start is called before the first frame update
     void Start()
     {
@@ -52,7 +60,7 @@ public class HexMeshGenerator : MonoBehaviour
         CreateLandTiles();
 
         // more efficient to do it here, but in update we can see them be generated
-        GenerateTriangles();
+        GenerateMeshMaterialsAndColor();
         UpdateMesh();
 
         GenerateHexColliders();
@@ -61,6 +69,12 @@ public class HexMeshGenerator : MonoBehaviour
     private void Update()
     {
         GetAdjustmentInput();
+
+        if (editMode)
+        {
+            GenerateMeshMaterialsAndColor();
+            UpdateMesh();
+        }
     }
 
     void GetAdjustmentInput()
@@ -79,11 +93,13 @@ public class HexMeshGenerator : MonoBehaviour
             var landTile = landTiles.Find(c => c.id == selectedTile.id);
             Vector3 pos = landTile.center;
             pos.y += adjustment;
+            if (pos.y > maxTerrainHeight) maxTerrainHeight = pos.y;
+            if (pos.y < minTerrainHeight) minTerrainHeight = pos.y;
             landTile.center = pos;
             landTile.GenerateInnerHexVertices(spacing);
             selectedTile.transform.position = pos;
 
-            GenerateTriangles();
+            GenerateMeshMaterialsAndColor();
             UpdateMesh();
         }        
     }
@@ -101,6 +117,8 @@ public class HexMeshGenerator : MonoBehaviour
                 float y;
                 if (usePerlin) y = Mathf.PerlinNoise(x * .3f, z * .3f) * perlinMultiplier;
                 else y = 0;
+                if (y > maxTerrainHeight) maxTerrainHeight = y;
+                if (y < minTerrainHeight) minTerrainHeight = y;
 
                 LandTile landTile = new LandTile(
                     index,
@@ -126,7 +144,7 @@ public class HexMeshGenerator : MonoBehaviour
         }
     }
 
-    void GenerateTriangles()
+    void GenerateMeshMaterialsAndColor()
     {
         meshMaterials.triangles.Clear();
         meshMaterials.vertices.Clear();
@@ -137,6 +155,14 @@ public class HexMeshGenerator : MonoBehaviour
             if (useComplexMesh) meshMaterials = landTile.ComplexAddTriangles(meshMaterials, coveredTiles);
             else meshMaterials = landTile.AddTriangles(meshMaterials, coveredTiles);
         }
+
+        colors = new Color[meshMaterials.vertices.Count];
+        for (int i = 0; i < colors.Length; i++)
+        {
+            float height = Mathf.InverseLerp(minTerrainHeight, maxTerrainHeight, meshMaterials.vertices[i].y);
+            colors[i] = gradient.Evaluate(height);
+        }
+
     }
 
     void UpdateMesh()
@@ -145,6 +171,7 @@ public class HexMeshGenerator : MonoBehaviour
 
         mesh.vertices = meshMaterials.vertices.ToArray();
         mesh.triangles = meshMaterials.triangles.ToArray();
+        mesh.colors = colors;
 
         mesh.RecalculateNormals();
     }
