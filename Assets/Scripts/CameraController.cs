@@ -11,6 +11,10 @@ public class CameraController : MonoBehaviour
     Vector3 lastMousePosition;
     public float dragSpeed = 0.01f;
 
+    Vector3 lastMouseRightPosition;
+    public float dragRotateSpeed = 0.01f;
+    Vector3 rotateAroundPoint;
+
     [Header("Rotation")]
     // Button Rotation Vars
     public float rotateSpeed = 40;
@@ -20,8 +24,12 @@ public class CameraController : MonoBehaviour
     public float minY = 5f;
     public float maxY = 30f;
 
+    [HideInInspector]
+    public bool movementOn = true;
+
     void Update()
     {
+        if (!movementOn) return;
         ButtonMovementInputs();
         ButtonRotationInputs();
         MouseInputs();
@@ -48,9 +56,33 @@ public class CameraController : MonoBehaviour
         {
             Vector3 delta = Input.mousePosition - lastMousePosition;
 
-            MoveCamera(-1 * dragSpeed * delta.x, -1 * dragSpeed * delta.y);
+            MoveCamera(-1 * dragSpeed * Mathf.Clamp(transform.position.y,25f,Mathf.Infinity) * delta.x, -1 * dragSpeed * Mathf.Clamp(transform.position.y, 25f, Mathf.Infinity) * delta.y);
 
             lastMousePosition = Input.mousePosition;
+        }
+
+        if (Input.GetMouseButtonDown(1))
+        {
+            lastMouseRightPosition = Input.mousePosition;
+            Ray inputRay = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+            RaycastHit hit;
+            if (Physics.Raycast(inputRay, out hit))
+            {
+                rotateAroundPoint = hit.point;
+            } else
+            {
+                rotateAroundPoint = new Vector3(Camera.main.transform.position.x, 0, Camera.main.transform.position.z);
+            }
+        }
+        else if (Input.GetMouseButton(1))
+        {
+            Vector3 delta = Input.mousePosition - lastMouseRightPosition;
+
+            float xlook = Mathf.Sin(transform.eulerAngles.y * Mathf.PI / 180) * lookAhead;
+            float zlook = Mathf.Cos(transform.eulerAngles.y * Mathf.PI / 180) * lookAhead;
+            transform.RotateAround(rotateAroundPoint, Vector3.up, dragRotateSpeed * delta.x * Time.deltaTime);
+
+            lastMouseRightPosition = Input.mousePosition;
         }
     }
 
@@ -62,19 +94,19 @@ public class CameraController : MonoBehaviour
 
         if (Input.GetKey("w"))
         {
-            inputZ += panSpeed * Time.deltaTime;
+            inputZ -= panSpeed * Mathf.Clamp(transform.position.y, 25f, Mathf.Infinity) * Time.deltaTime;
         }
         if (Input.GetKey("s"))
         {
-            inputZ -= panSpeed * Time.deltaTime;
+            inputZ += panSpeed * Mathf.Clamp(transform.position.y, 25f, Mathf.Infinity) * Time.deltaTime;
         }
         if (Input.GetKey("d"))
         {
-            inputX += panSpeed * Time.deltaTime;
+            inputX -= panSpeed * Mathf.Clamp(transform.position.y, 25f, Mathf.Infinity) * Time.deltaTime;
         }
         if (Input.GetKey("a"))
         {
-            inputX -= panSpeed * Time.deltaTime;
+            inputX += panSpeed * Mathf.Clamp(transform.position.y, 25f, Mathf.Infinity) * Time.deltaTime;
         }
 
         MoveCamera(inputX, inputZ);
@@ -82,38 +114,27 @@ public class CameraController : MonoBehaviour
 
     void ButtonRotationInputs()
     {
-        if (Input.GetKey("q") || Input.GetKey("e"))
+        if (Input.GetKeyDown("q") || Input.GetKeyDown("e"))
         {
-            float xlook = Mathf.Sin(transform.eulerAngles.y * Mathf.PI / 180) * lookAhead;
-            float zlook = Mathf.Cos(transform.eulerAngles.y * Mathf.PI / 180) * lookAhead;
-
-            float finalRotateSpeed = 0;
-
-            if (Input.GetKey("q"))
+            Ray inputRay = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+            RaycastHit hit;
+            if (Physics.Raycast(inputRay, out hit))
             {
-                finalRotateSpeed = rotateSpeed * Time.deltaTime;
+                rotateAroundPoint = hit.point;
             }
-            if (Input.GetKey("e"))
+            else
             {
-                finalRotateSpeed = -rotateSpeed * Time.deltaTime;
+                rotateAroundPoint = new Vector3(Camera.main.transform.position.x, 0, Camera.main.transform.position.z);
             }
-
-            transform.RotateAround(transform.position + new Vector3(xlook, 0, zlook), Vector3.up, finalRotateSpeed * Time.deltaTime);
         }
 
         if (Input.GetKey("q"))
         {
-            float lookAhead = 2f;
-            float xlook = Mathf.Sin(transform.eulerAngles.y * Mathf.PI / 180) * lookAhead;
-            float zlook = Mathf.Cos(transform.eulerAngles.y * Mathf.PI / 180) * lookAhead;
-            transform.RotateAround(transform.position + new Vector3 (xlook, 0, zlook), Vector3.up, rotateSpeed * Time.deltaTime);
+            transform.RotateAround(rotateAroundPoint, Vector3.up, rotateSpeed * Time.deltaTime);
         }
         if (Input.GetKey("e"))
         {
-            float lookAhead = 2f;
-            float xlook = Mathf.Sin(transform.eulerAngles.y * Mathf.PI / 180) * lookAhead;
-            float zlook = Mathf.Cos(transform.eulerAngles.y * Mathf.PI / 180) * lookAhead;
-            transform.RotateAround(transform.position + new Vector3(xlook, 0, zlook), Vector3.up, -rotateSpeed * Time.deltaTime);
+            transform.RotateAround(rotateAroundPoint, Vector3.up, -rotateSpeed * Time.deltaTime);
         }
     }
 
