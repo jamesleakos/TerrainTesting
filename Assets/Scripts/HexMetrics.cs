@@ -96,7 +96,7 @@ public class HexMetrics
         int delta = elevation2 - elevation1;
         if (delta == 1 || delta == -1 || delta == 2 || delta == -2)
         {
-            return HexEdgeType.Terrace;
+            //return HexEdgeType.Terrace;
         }
         return HexEdgeType.Cliff;
     }
