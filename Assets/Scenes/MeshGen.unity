@@ -794,12 +794,13 @@ MonoBehaviour:
   height: 6
   usePerlin: 1
   perlinMultiplier: 4.5
-  innerHexProportion: 0.5
+  innerHexProportion: 0.35
   cellPrefab: {fileID: 1031010503940173454, guid: 4817fe5d910ffed4fbd86791b98d8666,
     type: 3}
   cellLabelPrefab: {fileID: 5716401517866975709, guid: 3165ed1bd6bb1e84b8335b871d555ab1,
     type: 3}
   defaultColor: {r: 0.11420022, g: 1, b: 0.033018887, a: 1}
+  noiseSource: {fileID: 2800000, guid: 105497d5d25b9ba4cb4e57e9f20cc1fd, type: 3}
 --- !u!4 &275531130
 Transform:
   m_ObjectHideFlags: 0

@@ -30,8 +30,20 @@ public class HexGrid : MonoBehaviour
     // color
     public Color defaultColor = Color.white;
 
+    [Header("Irregularity Settings")]
+    public Texture2D noiseSource;
+
+
+    private void OnEnable()
+    {
+        HexMetrics.noiseSource = noiseSource;
+        HexMetrics.solidFactor = innerHexProportion;
+    }
+
     void Awake()
     {
+        HexMetrics.noiseSource = noiseSource;
+        HexMetrics.solidFactor = innerHexProportion;
         gridCanvas = GetComponentInChildren<Canvas>();
         hexMesh = GetComponentInChildren<HexMesh>();
         cells = new HexCell[height * width];
@@ -109,6 +121,7 @@ public class HexGrid : MonoBehaviour
         cell.uiRect = label.rectTransform;
 
         if (usePerlin) cell.Elevation = (int)(Mathf.PerlinNoise(x * .3f, z * .3f) * perlinMultiplier);
+        else cell.Elevation = 0;
     }
 
 }

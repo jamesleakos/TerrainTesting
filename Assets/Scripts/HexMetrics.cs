@@ -2,17 +2,35 @@
 
 public class HexMetrics
 {
+    #region Vars
+
+    // size
     public const float outerRadius = 10f;
     public const float innerRadius = outerRadius * 0.866025404f;
 
-    public const float solidFactor = 0.42f;
-    public const float blendFactor = 1f - solidFactor;
+    // inner hex ratio
+    //public const float solidFactor = 0.9f;
+    //public const float blendFactor = 1f - solidFactor;
+    public static float solidFactor;
 
+    // elevation
     public const float elevationStep = 5f;
+
+    // terraces
     public const int terracesPerSlope = 2;
     public const int terraceSteps = terracesPerSlope * 2 + 1;
     public const float horizontalTerraceStepSize = 1f / terraceSteps;
     public const float verticalTerraceStepSize = 1f / (terracesPerSlope + 1);
+
+    // perturbation and noise
+    public const float cellPerturbStrength = 5f;
+    public const float elevationPerturbStrength = 1.5f;
+    public const float noiseScale = 0.003f;
+    public static Texture2D noiseSource;
+
+    #endregion
+
+    #region Getting Corners
 
     static Vector3[] corners = {
         new Vector3(0f, 0f, outerRadius),
@@ -43,9 +61,14 @@ public class HexMetrics
         return corners[((int)direction + 1) % 6] * solidFactor;
     }
 
+    #endregion
+
+    #region Bridges, Terraces, and Edges
+
     public static Vector3 GetBridge(HexDirection direction)
     {
-        return (corners[(int)direction] + corners[((int)direction + 1) % 6]) * blendFactor;
+        //return (corners[(int)direction] + corners[((int)direction + 1) % 6]) * blendFactor;
+        return (corners[(int)direction] + corners[((int)direction + 1) % 6]) * (1 - solidFactor);
     }
 
     public static Vector3 TerraceLerp(Vector3 a, Vector3 b, int step)
@@ -77,6 +100,21 @@ public class HexMetrics
         }
         return HexEdgeType.Cliff;
     }
+
+    #endregion
+
+    #region Noise and Irreg
+
+    public static Vector4 SampleNoise(Vector3 position)
+    {
+        return noiseSource.GetPixelBilinear(
+            position.x * noiseScale,
+            position.z * noiseScale
+        );
+    }
+
+    #endregion
+
 }
 
 public enum HexEdgeType
