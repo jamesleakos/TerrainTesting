@@ -793,8 +793,8 @@ MonoBehaviour:
   width: 6
   height: 6
   usePerlin: 1
-  perlinMultiplier: 4.5
-  innerHexProportion: 0.513
+  perlinMultiplier: 14.5
+  innerHexProportion: 0.474
   cellPrefab: {fileID: 1031010503940173454, guid: 4817fe5d910ffed4fbd86791b98d8666,
     type: 3}
   cellLabelPrefab: {fileID: 5716401517866975709, guid: 3165ed1bd6bb1e84b8335b871d555ab1,
