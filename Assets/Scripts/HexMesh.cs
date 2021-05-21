@@ -356,10 +356,10 @@ public class HexMesh : MonoBehaviour
 
                 for (int i = 0; i < HexMetrics.terraceSteps - 2; i += 2)
                 {
-                    AddTriangleUnperturbed(
-                        HexMetrics.TerraceLerp(Perturb(right), Perturb(left), i),
-                        HexMetrics.TerraceLerp(Perturb(right), Perturb(left), i + 2),
-                        HexMetrics.TerraceLerp(Perturb(right), Perturb(left), i + 1)
+                    AddTriangle(
+                        HexMetrics.TerraceLerp(right, left, i),
+                        HexMetrics.TerraceLerp(right, left, i + 2),
+                        HexMetrics.TerraceLerp(right, left, i + 1)
                     );
                     AddTriangleColor(
                         HexMetrics.TerraceLerp(rightCell.color, leftCell.color, i),
@@ -367,25 +367,121 @@ public class HexMesh : MonoBehaviour
                         HexMetrics.TerraceLerp(rightCell.color, leftCell.color, i + 1)
                     );
                 }
+
+                // fill gaps between smoothed steps and quad
+                if (HexMetrics.terracesPerSlope <= 1) return;
+
+                // add first tri
+                AddTriangleUnperturbed(
+                    Perturb(right),
+                    Vector3.Lerp(Perturb(right), Perturb(HexMetrics.TerraceLerp(right, left, HexMetrics.terraceSteps - 1)), (float)2 / (float)(HexMetrics.terraceSteps - 1)),
+                    Perturb(HexMetrics.TerraceLerp(right, left, 2))                
+                );
+                AddTriangleColor(
+                    leftCell.color,
+                    HexMetrics.TerraceLerp(leftCell.color, rightCell.color, 2),
+                    HexMetrics.TerraceLerp(leftCell.color, rightCell.color, 2)
+                );
+                // add last tri
+                AddTriangleUnperturbed(
+                    Perturb(HexMetrics.TerraceLerp(right, left, HexMetrics.terraceSteps - 3)),
+                    Vector3.Lerp(Perturb(right), Perturb(HexMetrics.TerraceLerp(right, left, HexMetrics.terraceSteps - 1)), (float)(HexMetrics.terraceSteps - 3) / (float)(HexMetrics.terraceSteps - 1)),
+                    Perturb(HexMetrics.TerraceLerp(right, left, HexMetrics.terraceSteps - 1))
+                    
+                );
+                AddTriangleColor(
+                    HexMetrics.TerraceLerp(leftCell.color, rightCell.color, HexMetrics.terraceSteps - 3),
+                    HexMetrics.TerraceLerp(leftCell.color, rightCell.color, HexMetrics.terraceSteps - 1),
+                    HexMetrics.TerraceLerp(leftCell.color, rightCell.color, HexMetrics.terraceSteps - 1)
+                );
+
+                // fill quads in situations where there are more steps than 2
+                if (HexMetrics.terracesPerSlope <= 2) return;
+
+                for (int i = 2; i < HexMetrics.terraceSteps - 3; i += 2)
+                {
+                    AddQuadUnperturbed(                        
+                        Vector3.Lerp(Perturb(right), Perturb(HexMetrics.TerraceLerp(right, left, HexMetrics.terraceSteps - 1)), (float)(i + 2) / (float)(HexMetrics.terraceSteps - 1)),
+                        Vector3.Lerp(Perturb(right), Perturb(HexMetrics.TerraceLerp(right, left, HexMetrics.terraceSteps - 1)), (float)(i) / (float)(HexMetrics.terraceSteps - 1)),                        
+                        Perturb(HexMetrics.TerraceLerp(right, left, i + 2)),
+                        Perturb(HexMetrics.TerraceLerp(right, left, i))
+
+                    );
+                    AddQuadColor(
+                        HexMetrics.TerraceLerp(leftCell.color, rightCell.color, i),
+                        HexMetrics.TerraceLerp(leftCell.color, rightCell.color, i + 2),
+                        HexMetrics.TerraceLerp(leftCell.color, rightCell.color, i),
+                        HexMetrics.TerraceLerp(leftCell.color, rightCell.color, i + 2)
+                    );
+                }
             }
             else
             {
+                // add quad to get to steps
                 AddQuad(v3, v4, left, HexMetrics.TerraceLerp(left, right, HexMetrics.terraceSteps - 1));
                 AddQuadColor(c3, c4, c3, c4);
 
+                // add large final triangle
                 AddTriangle(v4, HexMetrics.TerraceLerp(left, right, HexMetrics.terraceSteps - 1), right);
                 AddTriangleColor(c4, HexMetrics.TerraceLerp(leftCell.color, rightCell.color, HexMetrics.terraceSteps - 1), rightCell.color);
 
+                // fill in step gaps between steps
                 for (int i = 0; i < HexMetrics.terraceSteps - 2; i += 2)
                 {
-                    AddTriangleUnperturbed(
-                        Perturb(HexMetrics.TerraceLerp(Perturb(left), Perturb(right), i)),
-                        Perturb(HexMetrics.TerraceLerp(Perturb(left), Perturb(right), i + 1)),
-                        Perturb(HexMetrics.TerraceLerp(Perturb(left), Perturb(right), i + 2))
+                    AddTriangle(
+                        HexMetrics.TerraceLerp(left, right, i),
+                        HexMetrics.TerraceLerp(left, right, i + 1),
+                        HexMetrics.TerraceLerp(left, right, i + 2)
                     );
                     AddTriangleColor(
                         HexMetrics.TerraceLerp(leftCell.color, rightCell.color, i),
                         HexMetrics.TerraceLerp(leftCell.color, rightCell.color, i + 1),
+                        HexMetrics.TerraceLerp(leftCell.color, rightCell.color, i + 2)
+                    );
+                }
+
+                // fill gaps between smoothed steps and quad
+                if (HexMetrics.terracesPerSlope <= 1) return;
+
+                // add first tri
+                AddTriangleUnperturbed(
+                    Perturb(left),
+                    Perturb(HexMetrics.TerraceLerp(left, right, 2)),
+                    Vector3.Lerp(Perturb(left), Perturb(HexMetrics.TerraceLerp(left, right, HexMetrics.terraceSteps - 1)),(float)2/(float)(HexMetrics.terraceSteps - 1))
+                );
+                AddTriangleColor(
+                    leftCell.color,
+                    HexMetrics.TerraceLerp(leftCell.color, rightCell.color, 2),
+                    HexMetrics.TerraceLerp(leftCell.color, rightCell.color, 2)
+                );
+                // add last tri
+                AddTriangleUnperturbed(
+                    Perturb(HexMetrics.TerraceLerp(left, right, HexMetrics.terraceSteps - 3)),
+                    Perturb(HexMetrics.TerraceLerp(left, right, HexMetrics.terraceSteps - 1)),
+                    Vector3.Lerp(Perturb(left), Perturb(HexMetrics.TerraceLerp(left, right, HexMetrics.terraceSteps - 1)), (float)(HexMetrics.terraceSteps - 3) / (float)(HexMetrics.terraceSteps - 1))
+                );
+                AddTriangleColor(
+                    HexMetrics.TerraceLerp(leftCell.color, rightCell.color, HexMetrics.terraceSteps - 3),
+                    HexMetrics.TerraceLerp(leftCell.color, rightCell.color, HexMetrics.terraceSteps - 1),
+                    HexMetrics.TerraceLerp(leftCell.color, rightCell.color, HexMetrics.terraceSteps - 1)
+                );
+
+                // fill quads in situations where there are more steps than 2
+                if (HexMetrics.terracesPerSlope <= 2) return;
+
+                for (int i = 2; i < HexMetrics.terraceSteps - 3; i += 2)
+                {
+                    AddQuadUnperturbed(
+                        Vector3.Lerp(Perturb(left), Perturb(HexMetrics.TerraceLerp(left, right, HexMetrics.terraceSteps - 1)), (float)(i) / (float)(HexMetrics.terraceSteps - 1)),
+                        Vector3.Lerp(Perturb(left), Perturb(HexMetrics.TerraceLerp(left, right, HexMetrics.terraceSteps - 1)), (float)(i + 2) / (float)(HexMetrics.terraceSteps - 1)),
+                        Perturb(HexMetrics.TerraceLerp(left, right, i)),
+                        Perturb(HexMetrics.TerraceLerp(left, right, i + 2))
+
+                    );
+                    AddQuadColor(
+                        HexMetrics.TerraceLerp(leftCell.color, rightCell.color, i),
+                        HexMetrics.TerraceLerp(leftCell.color, rightCell.color, i + 2),
+                        HexMetrics.TerraceLerp(leftCell.color, rightCell.color, i),
                         HexMetrics.TerraceLerp(leftCell.color, rightCell.color, i + 2)
                     );
                 }
@@ -445,6 +541,21 @@ public class HexMesh : MonoBehaviour
         vertices.Add(Perturb(v2));
         vertices.Add(Perturb(v3));
         vertices.Add(Perturb(v4));
+        triangles.Add(vertexIndex);
+        triangles.Add(vertexIndex + 2);
+        triangles.Add(vertexIndex + 1);
+        triangles.Add(vertexIndex + 1);
+        triangles.Add(vertexIndex + 2);
+        triangles.Add(vertexIndex + 3);
+    }
+
+    void AddQuadUnperturbed(Vector3 v1, Vector3 v2, Vector3 v3, Vector3 v4)
+    {
+        int vertexIndex = vertices.Count;
+        vertices.Add(v1);
+        vertices.Add(v2);
+        vertices.Add(v3);
+        vertices.Add(v4);
         triangles.Add(vertexIndex);
         triangles.Add(vertexIndex + 2);
         triangles.Add(vertexIndex + 1);

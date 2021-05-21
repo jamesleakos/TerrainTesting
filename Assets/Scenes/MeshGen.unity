@@ -1875,7 +1875,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   panSpeed: 10
-  scrollSpeed: 200
+  scrollSpeed: 20
   dragSpeed: 0.002
   dragRotateSpeed: 100
   rotateSpeed: 250
