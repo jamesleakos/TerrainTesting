@@ -4,7 +4,10 @@ public class HexMetrics
 {
     #region Vars
 
-    // size
+    // world  size
+    public const int chunkSizeX = 5, chunkSizeZ = 5;
+
+    // hex size
     public const float outerRadius = 10f;
     public const float innerRadius = outerRadius * 0.866025404f;
 
@@ -14,17 +17,35 @@ public class HexMetrics
     public static float solidFactor;
 
     // elevation
-    public const float elevationStep = 2f;
+    public static float elevationStep = 2f;
 
     // terraces
-    public const int terracesPerSlope = 2;
-    public const int terraceSteps = terracesPerSlope * 2 + 1;
-    public const float horizontalTerraceStepSize = 1f / terraceSteps;
-    public const float verticalTerraceStepSize = 1f / (terracesPerSlope + 1);
+    //public const int terracesPerSlope = 2;
+    //public const int terraceSteps = terracesPerSlope * 2 + 1;
+    //public const float horizontalTerraceStepSize = 1f / terraceSteps;
+    //public const float verticalTerraceStepSize = 1f / (terracesPerSlope + 1);
+    public static int terracesPerSlope = 2;
+    public static int TerraceSteps {
+        get {
+            return terracesPerSlope * 2 + 1;
+        }
+    }
+    public static float HorizontalTerraceStepSize {
+        get {
+            return 1f / TerraceSteps;
+        }
+    }
+    public static float VerticalTerraceStepSize {
+        get {
+            return 1f / (terracesPerSlope + 1);
+        }
+    }
 
     // perturbation and noise
-    public const float cellPerturbStrength = 5f;
-    public const float elevationPerturbStrength = 1.5f;
+    //public const float cellPerturbStrength = 4f;
+    //public const float elevationPerturbStrength = 1.5f;
+    public static float cellPerturbStrength = 4f;
+    public static float elevationPerturbStrength = 1.5f;
     public const float noiseScale = 0.003f;
     public static Texture2D noiseSource;
 
@@ -73,17 +94,17 @@ public class HexMetrics
 
     public static Vector3 TerraceLerp(Vector3 a, Vector3 b, int step)
     {
-        float h = step * HexMetrics.horizontalTerraceStepSize;
+        float h = step * HexMetrics.HorizontalTerraceStepSize;
         a.x += (b.x - a.x) * h;
         a.z += (b.z - a.z) * h;
-        float v = ((step + 1) / 2) * HexMetrics.verticalTerraceStepSize;
+        float v = ((step + 1) / 2) * HexMetrics.VerticalTerraceStepSize;
         a.y += (b.y - a.y) * v;
         return a;
     }
 
     public static Color TerraceLerp(Color a, Color b, int step)
     {
-        float h = step * HexMetrics.horizontalTerraceStepSize;
+        float h = step * HexMetrics.HorizontalTerraceStepSize;
         return Color.Lerp(a, b, h);
     }
 

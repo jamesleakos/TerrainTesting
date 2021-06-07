@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class CameraController : MonoBehaviour
 {
@@ -48,6 +49,7 @@ public class CameraController : MonoBehaviour
     // Get mouse drag inputs
     void MouseInputs()
     {
+        if (EventSystem.current.IsPointerOverGameObject()) return;
         if (Input.GetMouseButtonDown(0))
         {
             lastMousePosition = Input.mousePosition;

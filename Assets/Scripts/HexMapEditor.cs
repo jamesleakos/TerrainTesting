@@ -10,15 +10,25 @@ public class HexMapEditor : MonoBehaviour
 
     bool editOn;
     public Toggle editOnToggle;
+
+    bool applyColor;
+    bool applyElevation;
+
     private Color activeColor;
     int activeElevation;
 
     private HexCell selectedCell;
 
+    int brushSize;
+
 
     void Awake()
     {
         SelectColor(0);
+    }
+
+    private void Start()
+    {
     }
 
     void Update()
@@ -50,23 +60,51 @@ public class HexMapEditor : MonoBehaviour
         RaycastHit hit;
         if (Physics.Raycast(inputRay, out hit))
         {
-            if (editOn) EditCell(hexGrid.GetCell(hit.point));
+            if (editOn) EditCells(hexGrid.GetCell(hit.point));
             else selectedCell = hexGrid.GetCell(hit.point);
+        }
+    }
+
+    void EditCells(HexCell center)
+    {
+        int centerX = center.coordinates.X;
+        int centerZ = center.coordinates.Z;
+
+        for (int r = 0, z = centerZ - brushSize; z <= centerZ; z++, r++)
+        {
+            for (int x = centerX - r; x <= centerX + brushSize; x++)
+            {
+                EditCell(hexGrid.GetCell(new HexCoordinates(x, z)));
+            }
+        }
+        for (int r = 0, z = centerZ + brushSize; z > centerZ; z--, r++)
+        {
+            for (int x = centerX - brushSize; x <= centerX + r; x++)
+            {
+                EditCell(hexGrid.GetCell(new HexCoordinates(x, z)));
+            }
         }
     }
 
     void EditCell(HexCell cell)
     {
-        cell.color = activeColor;
-        cell.Elevation = activeElevation;
-        hexGrid.Refresh();
+        if (cell)
+        {
+            if (applyColor)
+            {
+                cell.Color = activeColor;
+            }
+            if (applyElevation)
+            {
+                cell.Elevation = activeElevation;
+            }
+        }        
     }
 
     void EditElevation(HexCell cell, bool adjustUp)
     {
         if (adjustUp) cell.Elevation = cell.Elevation + 1;
         else cell.Elevation = cell.Elevation - 1;
-        hexGrid.Refresh();
     }
 
     public void SetEditOn(bool set)
@@ -77,11 +115,30 @@ public class HexMapEditor : MonoBehaviour
 
     public void SelectColor(int index)
     {
-        activeColor = colors[index];
+        applyColor = index >= 0;
+        if (applyColor)
+        {
+            activeColor = colors[index];
+        }
     }
 
     public void SetElevation(float elevation)
     {
         activeElevation = (int)elevation;
+    }
+
+    public void SetApplyElevation(bool toggle)
+    {
+        applyElevation = toggle;
+    }
+
+    public void SetBrushSize(float size)
+    {
+        brushSize = (int)size;
+    }
+
+    public void ShowUI(bool visible)
+    {
+        hexGrid.ShowUI(visible);
     }
 }
