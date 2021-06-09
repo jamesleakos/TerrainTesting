@@ -8,8 +8,12 @@ public class HexMetrics
     public const int chunkSizeX = 5, chunkSizeZ = 5;
 
     // hex size
+    public const float outerToInner = 0.866025404f;
+    public const float innerToOuter = 1f / outerToInner;
+
     public const float outerRadius = 10f;
-    public const float innerRadius = outerRadius * 0.866025404f;
+
+    public const float innerRadius = outerRadius * outerToInner;
 
     // inner hex ratio
     //public const float solidFactor = 0.9f;
@@ -48,6 +52,9 @@ public class HexMetrics
     public static float elevationPerturbStrength = 1.5f;
     public const float noiseScale = 0.003f;
     public static Texture2D noiseSource;
+
+    // rivers
+    public const float streamBedElevationOffset = -1f;
 
     #endregion
 
@@ -126,6 +133,15 @@ public class HexMetrics
 
     #region Noise and Irreg
 
+    public static Vector3 Perturb(Vector3 position)
+    {
+        Vector4 sample = SampleNoise(position);
+        position.x += (sample.x * 2f - 1f) * cellPerturbStrength;
+        //position.y += (sample.y * 2f - 1f) * HexMetrics.cellPerturbStrength;
+        position.z += (sample.z * 2f - 1f) * cellPerturbStrength;
+        return position;
+    }
+
     public static Vector4 SampleNoise(Vector3 position)
     {
         return noiseSource.GetPixelBilinear(
@@ -136,6 +152,13 @@ public class HexMetrics
 
     #endregion
 
+    public static Vector3 GetSolidEdgeMiddle(HexDirection direction)
+    {
+        return
+            (corners[(int)direction] + corners[((int)direction + 1)%6]) *
+            (0.5f * solidFactor);
+    }
+
 }
 
 public enum HexEdgeType
@@ -145,14 +168,15 @@ public enum HexEdgeType
 
 public struct EdgeVertices
 {
-    public Vector3 v1, v2, v3, v4;
+    public Vector3 v1, v2, v3, v4, v5;
 
     public EdgeVertices(Vector3 corner1, Vector3 corner2)
     {
         v1 = corner1;
-        v2 = Vector3.Lerp(corner1, corner2, 1f / 3f);
-        v3 = Vector3.Lerp(corner1, corner2, 2f / 3f);
-        v4 = corner2;
+        v2 = Vector3.Lerp(corner1, corner2, 0.25f);
+        v3 = Vector3.Lerp(corner1, corner2, 0.5f);
+        v4 = Vector3.Lerp(corner1, corner2, 0.75f);
+        v5 = corner2;
     }
 
     public static EdgeVertices TerraceLerp(EdgeVertices a, EdgeVertices b, int step)
@@ -162,6 +186,16 @@ public struct EdgeVertices
         result.v2 = HexMetrics.TerraceLerp(a.v2, b.v2, step);
         result.v3 = HexMetrics.TerraceLerp(a.v3, b.v3, step);
         result.v4 = HexMetrics.TerraceLerp(a.v4, b.v4, step);
+        result.v5 = HexMetrics.TerraceLerp(a.v5, b.v5, step);
         return result;
+    }
+
+    public EdgeVertices(Vector3 corner1, Vector3 corner2, float outerStep)
+    {
+        v1 = corner1;
+        v2 = Vector3.Lerp(corner1, corner2, outerStep);
+        v3 = Vector3.Lerp(corner1, corner2, 0.5f);
+        v4 = Vector3.Lerp(corner1, corner2, 1f - outerStep);
+        v5 = corner2;
     }
 }

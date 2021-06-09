@@ -4,46 +4,74 @@ using UnityEngine.EventSystems;
 
 public class HexMapEditor : MonoBehaviour
 {
-    public Color[] colors;
-
     public HexGrid hexGrid;
+
+    #region Editing Info
 
     bool editOn;
     public Toggle editOnToggle;
 
-    bool applyColor;
-    bool applyElevation;
+    int brushSize;
+    private HexCell selectedCell;
+    
+    #endregion
 
+    #region Color and Elevation
+
+    // Color
+    public Color[] colors;
+
+    bool applyColor;
     private Color activeColor;
+
+    // Elevation
+    bool applyElevation;
     int activeElevation;
 
-    private HexCell selectedCell;
 
-    int brushSize;
+    #endregion
 
+    #region Rivers
+
+    enum OptionalToggle
+    {
+        Ignore, Yes, No
+    }
+    OptionalToggle riverMode;
+
+    // dragging for rivers
+    bool isDrag;
+    HexDirection dragDirection;
+    HexCell previousCell;
+
+    #endregion
 
     void Awake()
     {
         SelectColor(0);
     }
 
-    private void Start()
-    {
-    }
-
     void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            SetEditOn(!editOn);
-            editOnToggle.isOn = editOn;
-        }
+    {        
         if (Input.GetMouseButton(0) &&
             !EventSystem.current.IsPointerOverGameObject()
         )
         {
             HandleInput();
-        } 
+        }
+        else
+        {
+            previousCell = null;
+        }
+
+        // toggling intput on
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            SetEditOn(!editOn);
+            editOnToggle.isOn = editOn;
+        }
+
+        // editing height of selected cell
         if (Input.GetKeyDown(KeyCode.UpArrow)) {
             if (selectedCell == null) return;
             EditElevation(selectedCell, true);
@@ -60,9 +88,43 @@ public class HexMapEditor : MonoBehaviour
         RaycastHit hit;
         if (Physics.Raycast(inputRay, out hit))
         {
-            if (editOn) EditCells(hexGrid.GetCell(hit.point));
+            if (editOn)
+            {
+                HexCell currentCell = hexGrid.GetCell(hit.point);
+                if (previousCell && previousCell != currentCell)
+                {
+                    ValidateDrag(currentCell);
+                }
+                else
+                {
+                    isDrag = false;
+                }
+                EditCells(currentCell);
+                previousCell = currentCell;
+            }
             else selectedCell = hexGrid.GetCell(hit.point);
         }
+        else
+        {
+            previousCell = null;
+        }
+    }
+
+    void ValidateDrag(HexCell currentCell)
+    {
+        for (
+            dragDirection = HexDirection.NE;
+            dragDirection <= HexDirection.NW;
+            dragDirection++
+        )
+        {
+            if (previousCell.GetNeighbor(dragDirection) == currentCell)
+            {
+                isDrag = true;
+                return;
+            }
+        }
+        isDrag = false;
     }
 
     void EditCells(HexCell center)
@@ -97,6 +159,18 @@ public class HexMapEditor : MonoBehaviour
             if (applyElevation)
             {
                 cell.Elevation = activeElevation;
+            }
+            if (riverMode == OptionalToggle.No)
+            {
+                cell.RemoveRiver();
+            }
+            else if (isDrag && riverMode == OptionalToggle.Yes)
+            {
+                HexCell otherCell = cell.GetNeighbor(dragDirection.Opposite());
+                if (otherCell)
+                {
+                    otherCell.SetOutgoingRiver(dragDirection);
+                }
             }
         }        
     }
@@ -140,5 +214,10 @@ public class HexMapEditor : MonoBehaviour
     public void ShowUI(bool visible)
     {
         hexGrid.ShowUI(visible);
+    }
+
+    public void SetRiverMode(int mode)
+    {
+        riverMode = (OptionalToggle)mode;
     }
 }
