@@ -15,6 +15,8 @@ public class HexCell : MonoBehaviour
 
     #region River Info
 
+    #region River Bools and Directions
+
     bool hasIncomingRiver, hasOutgoingRiver;
     HexDirection incomingRiver, outgoingRiver;
 
@@ -42,12 +44,6 @@ public class HexCell : MonoBehaviour
         }
     }
 
-    public Vector3 Position {
-        get {
-            return transform.localPosition;
-        }
-    }
-
     public bool HasRiver {
         get {
             return hasIncomingRiver || hasOutgoingRiver;
@@ -67,10 +63,26 @@ public class HexCell : MonoBehaviour
             hasOutgoingRiver && outgoingRiver == direction;
     }
 
+    #endregion
+
+    public Vector3 Position {
+        get {
+            return transform.localPosition;
+        }
+    }    
+
     public float StreamBedY {
         get {
             return
                 (elevation + HexMetrics.streamBedElevationOffset) *
+                HexMetrics.elevationStep;
+        }
+    }
+
+    public float RiverSurfaceY {
+        get {
+            return
+                (elevation + HexMetrics.riverSurfaceElevationOffset) *
                 HexMetrics.elevationStep;
         }
     }

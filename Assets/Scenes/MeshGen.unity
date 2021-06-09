@@ -1164,8 +1164,8 @@ MonoBehaviour:
   flatTerraces: 1
   upwardTrisForSoloBottomTerrace: 1
   noiseSource: {fileID: 2800000, guid: 105497d5d25b9ba4cb4e57e9f20cc1fd, type: 3}
-  cellPerturbStrength: 0
-  elevationPerturbStrength: 0
+  cellPerturbStrength: 5
+  elevationPerturbStrength: 3
   cellPrefab: {fileID: 1031010503940173454, guid: 4817fe5d910ffed4fbd86791b98d8666,
     type: 3}
   chunkPrefab: {fileID: 3516067942772402908, guid: f0c41d5db056d2b478a086d821a73c60,
@@ -2492,6 +2492,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e3b46bd26870a548a9baf9230d7fa82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  useCollider: 0
+  useColors: 0
   flatTerraces: 0
   upwardTrisForSoloBottomTerrace: 0
 --- !u!23 &681084596
@@ -2690,7 +2692,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 7.92e-43, y: 1.01e-43, z: 4.5905e-41, w: 0}
+  m_BoundingSphereOverride: {x: 0, y: 9.478e-42, z: 0, w: 0}
   m_UseBoundingSphereOverride: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
