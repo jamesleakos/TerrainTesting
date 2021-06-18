@@ -3,9 +3,15 @@
 public class HexMetrics
 {
     #region Vars
+    // start vars
+    #region World Size
 
     // world  size
     public const int chunkSizeX = 5, chunkSizeZ = 5;
+
+    #endregion
+
+    #region Hex Size
 
     // hex size
     public const float outerToInner = 0.866025404f;
@@ -20,8 +26,15 @@ public class HexMetrics
     //public const float blendFactor = 1f - solidFactor;
     public static float solidFactor;
 
+    #endregion
+
+    #region Elevation
     // elevation
     public static float elevationStep = 2f;
+
+    #endregion
+
+    #region Terraces
 
     // terraces
     //public const int terracesPerSlope = 2;
@@ -45,6 +58,10 @@ public class HexMetrics
         }
     }
 
+    #endregion
+
+    #region Perturbation and Noise
+
     // perturbation and noise
     //public const float cellPerturbStrength = 4f;
     //public const float elevationPerturbStrength = 1.5f;
@@ -53,11 +70,23 @@ public class HexMetrics
     public const float noiseScale = 0.003f;
     public static Texture2D noiseSource;
 
+    #endregion
+
+    #region Rivers
     // rivers
     public const float streamBedElevationOffset = -1.75f;
-    public const float riverSurfaceElevationOffset = -0.5f;
+    public const float waterElevationOffset = -0.5f;
+
+    #endregion
+
+    #region Water
+
+    public const float waterFactor = 0.6f;
+    public const float waterBlendFactor = 1f - waterFactor;
 
 
+    #endregion
+    /// end vars
     #endregion
 
     #region Getting Corners
@@ -131,6 +160,14 @@ public class HexMetrics
         return HexEdgeType.Cliff;
     }
 
+    public static Vector3 GetSolidEdgeMiddle(HexDirection direction)
+    {
+        return
+            (corners[(int)direction] + corners[((int)direction + 1) % 6]) *
+            (0.5f * solidFactor);
+    }
+
+
     #endregion
 
     #region Noise and Irreg
@@ -154,12 +191,25 @@ public class HexMetrics
 
     #endregion
 
-    public static Vector3 GetSolidEdgeMiddle(HexDirection direction)
+    #region Water
+
+    public static Vector3 GetFirstWaterCorner(HexDirection direction)
     {
-        return
-            (corners[(int)direction] + corners[((int)direction + 1)%6]) *
-            (0.5f * solidFactor);
+        return corners[(int)direction] * waterFactor;
     }
+
+    public static Vector3 GetSecondWaterCorner(HexDirection direction)
+    {
+        return corners[((int)direction + 1) % 6] * waterFactor;
+    }
+
+    public static Vector3 GetWaterBridge(HexDirection direction)
+    {
+        return (corners[(int)direction] + corners[(int)direction + 1]) * waterBlendFactor;
+    }
+
+
+    #endregion
 
 }
 
