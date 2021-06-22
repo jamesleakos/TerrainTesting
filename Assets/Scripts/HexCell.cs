@@ -115,6 +115,50 @@ public class HexCell : MonoBehaviour
 
     #endregion
 
+    #region Features
+
+    public int UrbanLevel {
+        get {
+            return urbanLevel;
+        }
+        set {
+            if (urbanLevel != value)
+            {
+                urbanLevel = value;
+                RefreshSelfOnly();
+            }
+        }
+    }
+
+    public int FarmLevel {
+        get {
+            return farmLevel;
+        }
+        set {
+            if (farmLevel != value)
+            {
+                farmLevel = value;
+                RefreshSelfOnly();
+            }
+        }
+    }
+
+    public int PlantLevel {
+        get {
+            return plantLevel;
+        }
+        set {
+            if (plantLevel != value)
+            {
+                plantLevel = value;
+                RefreshSelfOnly();
+            }
+        }
+    }
+
+    int urbanLevel, farmLevel, plantLevel;
+    #endregion
+
     #endregion
 
     #region Getting Neighbors and Edges
@@ -296,8 +340,7 @@ public class HexCell : MonoBehaviour
     public float RiverSurfaceY {
         get {
             return
-                (elevation + HexMetrics.waterElevationOffset) *
-                HexMetrics.elevationStep;
+                (elevation + HexMetrics.waterElevationOffset) * HexMetrics.elevationStep;
         }
     }
 

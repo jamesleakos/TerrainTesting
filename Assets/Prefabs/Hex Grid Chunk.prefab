@@ -1,5 +1,75 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &686615243786650856
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5246579113464356509}
+  - component: {fileID: 4967173620845453982}
+  m_Layer: 0
+  m_Name: Features
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5246579113464356509
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 686615243786650856}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 3516067942772402909}
+  m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4967173620845453982
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 686615243786650856}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a40b6492d02aa644aa97a50fa69f64d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  urbanCollections:
+  - prefabs:
+    - {fileID: 7698225926253521410, guid: 27527eb1d9f35024b8b7d041b5f8ddc0, type: 3}
+    - {fileID: 7063535430987354915, guid: 83483f54088212547a19f975490ec28f, type: 3}
+  - prefabs:
+    - {fileID: 2970740486815650533, guid: 2d8b5b91b2772e54a819d2d7a07e4047, type: 3}
+    - {fileID: 1737365891712057819, guid: 56d0a519b35179b4e9731907b03b96e0, type: 3}
+  - prefabs:
+    - {fileID: 4304227799049264280, guid: c2d613d2c4a28e041962a36293073982, type: 3}
+    - {fileID: 4217174802976101071, guid: 758393dce71580a488ab0504038a72a7, type: 3}
+  farmCollections:
+  - prefabs:
+    - {fileID: 9219358744704554512, guid: 9ae43e8979f138644bd31ff56f69ff11, type: 3}
+    - {fileID: 2538571753054428662, guid: 78119b0fa63cfd24c9360293fa94e0fc, type: 3}
+  - prefabs:
+    - {fileID: 2056439374815822514, guid: d452ca1cc8a38734fb053e44a2dbae84, type: 3}
+    - {fileID: 6333489332935759334, guid: fb64eca00ec0d944794a60e2904c1fa3, type: 3}
+  - prefabs:
+    - {fileID: 2228567558317804561, guid: 04e07d4650cc24e43baf60a7a95b14ab, type: 3}
+    - {fileID: 5826956787144813417, guid: 11c3a125933ce2c4aa8ed2aea3563193, type: 3}
+  plantCollections:
+  - prefabs:
+    - {fileID: 2035332897395039621, guid: 8998c43e6379e5947938c131425aaec3, type: 3}
+  - prefabs:
+    - {fileID: 4275256175740707922, guid: eada4edfed401994b84ef6c99c18d134, type: 3}
+  - prefabs:
+    - {fileID: 2784039093397589471, guid: 0892f3f4873b0774b988435c31e1dbe0, type: 3}
 --- !u!1 &2430382039810050102
 GameObject:
   m_ObjectHideFlags: 0
@@ -301,7 +371,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3516067942772402911}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.9583445, y: -12.148992, z: 1.0154006}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 3516067942667358620}
@@ -311,6 +381,7 @@ Transform:
   - {fileID: 8025511783196865195}
   - {fileID: 7863588566384420473}
   - {fileID: 4108667524146880280}
+  - {fileID: 5246579113464356509}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -332,6 +403,7 @@ MonoBehaviour:
   water: {fileID: 7040555860076420139}
   waterShore: {fileID: 4769081232624188698}
   estuaries: {fileID: 5612774989097495339}
+  features: {fileID: 4967173620845453982}
   flatTerraces: 0
   upwardTrisForSoloBottomTerrace: 0
 --- !u!1 &6367258611340669681

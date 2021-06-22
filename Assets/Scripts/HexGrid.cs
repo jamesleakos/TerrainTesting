@@ -30,6 +30,8 @@ public class HexGrid : MonoBehaviour
     public float cellPerturbStrength;
     [Range(0, 3)]
     public float elevationPerturbStrength;
+    public int seed;
+
 
     [Header("Prefabs")]
     public HexCell cellPrefab;
@@ -49,7 +51,11 @@ public class HexGrid : MonoBehaviour
 
     private void OnEnable()
     {
-        HexMetrics.noiseSource = noiseSource;
+        if (!HexMetrics.noiseSource)
+        {
+            HexMetrics.noiseSource = noiseSource;
+            HexMetrics.InitializeHashGrid(seed);
+        }
         HexMetrics.solidFactor = innerHexProportion;
         HexMetrics.elevationStep = elevationStep;
         HexMetrics.terracesPerSlope = terracesPerSlope;
@@ -60,6 +66,8 @@ public class HexGrid : MonoBehaviour
     void Awake()
     {
         HexMetrics.noiseSource = noiseSource;
+        HexMetrics.InitializeHashGrid(seed);
+
         HexMetrics.solidFactor = innerHexProportion;
 
         cellCountX = chunkCountX * HexMetrics.chunkSizeX;

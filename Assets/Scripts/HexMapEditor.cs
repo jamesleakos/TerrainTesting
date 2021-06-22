@@ -53,6 +53,15 @@ public class HexMapEditor : MonoBehaviour
 
     #endregion
 
+    #region Features
+
+    int activeUrbanLevel, activeFarmLevel, activePlantLevel;
+    bool applyUrbanLevel, applyFarmLevel, applyPlantLevel;
+
+    #endregion
+
+    // end variables
+
     void Awake()
     {
         SelectColor(0);
@@ -88,6 +97,8 @@ public class HexMapEditor : MonoBehaviour
             EditElevation(selectedCell, false);
         }
     }
+
+    #region Input
 
     void HandleInput()
     {
@@ -134,6 +145,10 @@ public class HexMapEditor : MonoBehaviour
         isDrag = false;
     }
 
+    #endregion
+
+    #region Edit Cells and Generic Editor Functions
+
     void EditCells(HexCell center)
     {
         int centerX = center.coordinates.X;
@@ -171,6 +186,18 @@ public class HexMapEditor : MonoBehaviour
             {
                 cell.WaterLevel = activeWaterLevel;
             }
+            if (applyUrbanLevel)
+            {
+                cell.UrbanLevel = activeUrbanLevel;
+            }
+            if (applyFarmLevel)
+            {
+                cell.FarmLevel = activeFarmLevel;
+            }
+            if (applyPlantLevel)
+            {
+                cell.PlantLevel = activePlantLevel;
+            }
             if (riverMode == OptionalToggle.No)
             {
                 cell.RemoveRiver();
@@ -197,35 +224,10 @@ public class HexMapEditor : MonoBehaviour
         }
     }
 
-    void EditElevation(HexCell cell, bool adjustUp)
-    {
-        if (adjustUp) cell.Elevation = cell.Elevation + 1;
-        else cell.Elevation = cell.Elevation - 1;
-    }
-
     public void SetEditOn(bool set)
     {
         editOn = set;
         Camera.main.GetComponent<CameraController>().movementOn = !set;
-    }
-
-    public void SelectColor(int index)
-    {
-        applyColor = index >= 0;
-        if (applyColor)
-        {
-            activeColor = colors[index];
-        }
-    }
-
-    public void SetElevation(float elevation)
-    {
-        activeElevation = (int)elevation;
-    }
-
-    public void SetApplyElevation(bool toggle)
-    {
-        applyElevation = toggle;
     }
 
     public void SetBrushSize(float size)
@@ -238,6 +240,43 @@ public class HexMapEditor : MonoBehaviour
         hexGrid.ShowUI(visible);
     }
 
+    #endregion
+
+    #region Color
+
+    public void SelectColor(int index)
+    {
+        applyColor = index >= 0;
+        if (applyColor)
+        {
+            activeColor = colors[index];
+        }
+    }
+
+    #endregion
+
+    #region Elevation
+
+    void EditElevation(HexCell cell, bool adjustUp)
+    {
+        if (adjustUp) cell.Elevation = cell.Elevation + 1;
+        else cell.Elevation = cell.Elevation - 1;
+    }
+
+    public void SetElevation(float elevation)
+    {
+        activeElevation = (int)elevation;
+    }
+
+    public void SetApplyElevation(bool toggle)
+    {
+        applyElevation = toggle;
+    }
+
+    #endregion
+
+    #region River
+
     public void SetRiverMode(int mode)
     {
         riverMode = (OptionalToggle)mode;
@@ -248,6 +287,10 @@ public class HexMapEditor : MonoBehaviour
         roadMode = (OptionalToggle)mode;
     }
 
+    #endregion
+
+    #region Water Level
+
     public void SetApplyWaterLevel(bool toggle)
     {
         applyWaterLevel = toggle;
@@ -257,4 +300,41 @@ public class HexMapEditor : MonoBehaviour
     {
         activeWaterLevel = (int)level;
     }
+
+    #endregion
+
+    #region Features
+
+    public void SetApplyUrbanLevel(bool toggle)
+    {
+        applyUrbanLevel = toggle;
+    }
+
+    public void SetUrbanLevel(float level)
+    {
+        activeUrbanLevel = (int)level;
+    }
+
+    public void SetApplyFarmLevel(bool toggle)
+    {
+        applyFarmLevel = toggle;
+    }
+
+    public void SetFarmLevel(float level)
+    {
+        activeFarmLevel = (int)level;
+    }
+
+    public void SetApplyPlantLevel(bool toggle)
+    {
+        applyPlantLevel = toggle;
+    }
+
+    public void SetPlantLevel(float level)
+    {
+        activePlantLevel = (int)level;
+    }
+
+    #endregion
+
 }
