@@ -77,8 +77,6 @@ public class HexCell : MonoBehaviour
     [SerializeField]
     bool[] roads;
 
-
-
     #endregion
 
     #region Water
@@ -114,7 +112,7 @@ public class HexCell : MonoBehaviour
     }
 
     #endregion
-
+        
     #region Features
 
     public int UrbanLevel {
@@ -157,6 +155,26 @@ public class HexCell : MonoBehaviour
     }
 
     int urbanLevel, farmLevel, plantLevel;
+
+    #endregion
+
+    #region Walls
+
+    public bool Walled {
+        get {
+            return walled;
+        }
+        set {
+            if (walled != value)
+            {
+                walled = value;
+                Refresh();
+            }
+        }
+    }
+
+    bool walled;
+
     #endregion
 
     #endregion
@@ -332,8 +350,7 @@ public class HexCell : MonoBehaviour
     public float StreamBedY {
         get {
             return
-                (elevation + HexMetrics.streamBedElevationOffset) *
-                HexMetrics.elevationStep;
+                (elevation + HexMetrics.streamBedElevationOffset) * HexMetrics.elevationStep;
         }
     }
 
@@ -395,7 +412,7 @@ public class HexCell : MonoBehaviour
 
     public void AddRoad(HexDirection direction)
     {
-        if (!roads[(int)direction] && !HasRiverThroughEdge(direction) && GetElevationDifference(direction) <= 1)
+        if (!roads[(int)direction] && !HasRiverThroughEdge(direction))// && GetElevationDifference(direction) <= 1)
         {
             SetRoad((int)direction, true);
         }

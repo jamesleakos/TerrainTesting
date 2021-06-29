@@ -31,13 +31,13 @@ public class HexMapEditor : MonoBehaviour
 
     #endregion
 
-    #region Rivers
+    #region Optional Toggles
 
     enum OptionalToggle
     {
         Ignore, Yes, No
     }
-    OptionalToggle riverMode, roadMode;
+    OptionalToggle riverMode, roadMode, walledMode;
 
     // dragging for rivers
     bool isDrag;
@@ -53,6 +53,15 @@ public class HexMapEditor : MonoBehaviour
 
     #endregion
 
+    #region Walls
+
+    public void SetWalledMode(int mode)
+    {
+        walledMode = (OptionalToggle)mode;
+    }
+
+    #endregion
+
     #region Features
 
     int activeUrbanLevel, activeFarmLevel, activePlantLevel;
@@ -64,7 +73,7 @@ public class HexMapEditor : MonoBehaviour
 
     void Awake()
     {
-        SelectColor(0);
+        SelectColor(-1);
     }
 
     void Update()
@@ -205,6 +214,10 @@ public class HexMapEditor : MonoBehaviour
             if (roadMode == OptionalToggle.No)
             {
                 cell.RemoveRoads();
+            }
+            if (walledMode != OptionalToggle.Ignore)
+            {
+                cell.Walled = walledMode == OptionalToggle.Yes;
             }
             if (isDrag)
             {
