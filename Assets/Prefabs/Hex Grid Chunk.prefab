@@ -75,6 +75,10 @@ MonoBehaviour:
     type: 3}
   bridgePrefab: {fileID: 7706534920108495103, guid: 02a0d1c1a2d3d774987ad54db1e04660,
     type: 3}
+  special:
+  - {fileID: 7824324596493474567, guid: 8a9171dcc17414b48b1b206ad150e4fd, type: 3}
+  - {fileID: 5237274682554840800, guid: 8154e2533c3fb054eb7799af1690cb2a, type: 3}
+  - {fileID: 7706534920108495103, guid: 02a0d1c1a2d3d774987ad54db1e04660, type: 3}
 --- !u!1 &1040798304870242502
 GameObject:
   m_ObjectHideFlags: 0

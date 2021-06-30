@@ -177,6 +177,30 @@ public class HexCell : MonoBehaviour
 
     #endregion
 
+    #region Special Features
+
+    int specialIndex;
+    public int SpecialIndex {
+        get {
+            return specialIndex;
+        }
+        set {
+            if (specialIndex != value)
+            {
+                specialIndex = value;
+                RefreshSelfOnly();
+            }
+        }
+    }
+    public bool IsSpecial {
+        get {
+            return specialIndex > 0;
+        }
+    }
+
+
+    #endregion
+
     #endregion
 
     #region Getting Neighbors and Edges

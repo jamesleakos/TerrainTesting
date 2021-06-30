@@ -97,6 +97,12 @@ public class HexGridChunk : MonoBehaviour
         {
             features.AddFeature(cell, cell.Position);
         }
+
+        if (cell.IsSpecial)
+        {
+            features.AddSpecialFeature(cell, cell.Position);
+        }
+
     }
 
     void Triangulate(HexDirection direction, HexCell cell)
