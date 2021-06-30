@@ -18,6 +18,9 @@ public class HexFeatureManager : MonoBehaviour
 
     public HexMesh walls;
 
+    public Transform wallTowerPrefab, bridgePrefab;
+
+
     public void Clear()
     {
         if (container)
@@ -116,7 +119,7 @@ public class HexFeatureManager : MonoBehaviour
         }
     }
 
-    void AddWallSegment(Vector3 nearLeft, Vector3 farLeft, Vector3 nearRight, Vector3 farRight)
+    void AddWallSegment(Vector3 nearLeft, Vector3 farLeft, Vector3 nearRight, Vector3 farRight, bool addTower = false)
     {
         nearLeft = HexMetrics.Perturb(nearLeft);
         farLeft = HexMetrics.Perturb(farLeft);
@@ -149,6 +152,15 @@ public class HexFeatureManager : MonoBehaviour
 
         walls.AddQuadUnperturbed(t1, t2, v3, v4);
 
+        if (addTower)
+        {
+            Transform towerInstance = Instantiate(wallTowerPrefab);
+            towerInstance.transform.localPosition = (left + right) * 0.5f;
+            Vector3 rightDirection = right - left;
+            rightDirection.y = 0f;
+            towerInstance.transform.right = rightDirection;
+            towerInstance.SetParent(container, false);
+        }
     }
 
     public void AddWall(Vector3 c1, HexCell cell1, Vector3 c2, HexCell cell2, Vector3 c3, HexCell cell3)
@@ -190,7 +202,10 @@ public class HexFeatureManager : MonoBehaviour
 
     void AddWallSegment(Vector3 pivot, HexCell pivotCell, Vector3 left, HexCell leftCell, Vector3 right, HexCell rightCell)
     {
-        AddWallSegment(pivot, left, pivot, right);
+        HexHash hash = HexMetrics.SampleHashGrid((pivot + left + right) * (1f / 3f));
+        bool hasTower = hash.e < HexMetrics.wallTowerThreshold;
+
+        AddWallSegment(pivot, left, pivot, right, hasTower);
     }
 
     void AddWallCap(Vector3 near, Vector3 far)
@@ -207,6 +222,26 @@ public class HexFeatureManager : MonoBehaviour
         v2 = v4 = center + thickness;
         v3.y = v4.y = center.y + HexMetrics.wallHeight;
         walls.AddQuadUnperturbed(v1, v2, v3, v4);
+    }
+
+    #endregion
+
+    #region Bridges
+
+    public void AddBridge(Vector3 roadCenter1, Vector3 roadCenter2)
+    {
+        roadCenter1 = HexMetrics.Perturb(roadCenter1);
+        roadCenter2 = HexMetrics.Perturb(roadCenter2);
+
+        Transform instance = Instantiate(bridgePrefab);
+        instance.localPosition = (roadCenter1 + roadCenter2) * 0.5f;
+        instance.forward = roadCenter2 - roadCenter1;
+        float length = Vector3.Distance(roadCenter1, roadCenter2);
+        instance.localScale = new Vector3(
+            1f, 1f, length * (1f / HexMetrics.bridgeDesignLength)
+        );
+
+        instance.SetParent(container, false);
     }
 
     #endregion

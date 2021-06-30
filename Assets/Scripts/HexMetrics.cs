@@ -93,7 +93,7 @@ public class HexMetrics
 
     #endregion
 
-    #region Features and Walls
+    #region Features and Walls and bridges
 
     static float[][] featureThresholds = {
         new float[] {0.0f, 0.0f, 0.4f},
@@ -101,10 +101,16 @@ public class HexMetrics
         new float[] {0.4f, 0.6f, 0.8f}
     };
 
-    public const float wallHeight = 3f;
+    public const float wallHeight = 4f;
+    public const float wallYOffset = -1f;
     public const float wallThickness = 0.75f;
     public static float wallElevationOffset = VerticalTerraceStepSize;
 
+    // Tower freq
+    public const float wallTowerThreshold = 0.5f;
+
+    // bridge length
+    public const float bridgeDesignLength = 7f;
 
 
 
@@ -283,10 +289,9 @@ public class HexMetrics
         near.x += (far.x - near.x) * 0.5f;
         near.z += (far.z - near.z) * 0.5f;
         float v = near.y < far.y ? wallElevationOffset : (1f - wallElevationOffset);
-        near.y += (far.y - near.y) * v;
+        near.y += (far.y - near.y) * v + wallYOffset;
         return near;
     }
-
 
     #endregion
 

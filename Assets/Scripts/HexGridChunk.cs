@@ -1065,9 +1065,7 @@ public class HexGridChunk : MonoBehaviour
 
         if (cell.HasRiverBeginOrEnd)
         {
-            roadCenter += HexMetrics.GetSolidEdgeMiddle(
-                cell.RiverBeginOrEndDirection.Opposite()
-            ) * (1f / 3f);
+            roadCenter += HexMetrics.GetSolidEdgeMiddle(cell.RiverBeginOrEndDirection.Opposite()) * (1f / 3f);
         }
         else if (cell.IncomingRiver == cell.OutgoingRiver.Opposite())
         {
@@ -1095,6 +1093,10 @@ public class HexGridChunk : MonoBehaviour
                 corner = HexMetrics.GetFirstSolidCorner(direction);
             }
             roadCenter += corner * 0.5f;
+            if (cell.IncomingRiver == direction.Next() && (cell.HasRoadThroughEdge(direction.Next2()) || cell.HasRoadThroughEdge(direction.Opposite())))
+            {
+                features.AddBridge(roadCenter, center - corner * 0.5f);
+            }
             center += corner * 0.25f;
         }
         else if (cell.IncomingRiver == cell.OutgoingRiver.Previous())
@@ -1111,8 +1113,7 @@ public class HexGridChunk : MonoBehaviour
             {
                 return;
             }
-            Vector3 offset = HexMetrics.GetSolidEdgeMiddle(direction) *
-                HexMetrics.innerToOuter;
+            Vector3 offset = HexMetrics.GetSolidEdgeMiddle(direction) * HexMetrics.innerToOuter;
             roadCenter += offset * 0.7f;
             center += offset * 0.5f;
         }
@@ -1139,7 +1140,12 @@ public class HexGridChunk : MonoBehaviour
             {
                 return;
             }
-            roadCenter += HexMetrics.GetSolidEdgeMiddle(middle) * 0.25f;
+            Vector3 offset = HexMetrics.GetSolidEdgeMiddle(middle);
+            roadCenter += offset * 0.25f;
+            if (direction == middle && cell.HasRoadThroughEdge(direction.Opposite()))
+            {
+                features.AddBridge(roadCenter, center - offset * (HexMetrics.innerToOuter * 0.7f));
+            }
         }
 
         Vector3 mL = Vector3.Lerp(roadCenter, e.v1, interpolators.x);
