@@ -3,6 +3,8 @@ using UnityEngine.EventSystems;
 
 public class CameraController : MonoBehaviour
 {
+    static CameraController instance;
+
     [Header("Movement")]
     // Button Movement Input Vars
     public float panSpeed = 20;
@@ -27,6 +29,16 @@ public class CameraController : MonoBehaviour
 
     [HideInInspector]
     public bool movementOn = true;
+
+    void OnEnable()
+    {
+        instance = this;
+    }
+    public static bool Locked {
+        set {
+            instance.enabled = !value;
+        }
+    }
 
     void Update()
     {
