@@ -44,10 +44,6 @@ public class HexGrid : MonoBehaviour
     // labels
     public Text cellLabelPrefab;
 
-    [Header("Color Settings")]
-    // color
-    public Color[] colors;
-
     #endregion
 
     private void OnEnable()
@@ -56,7 +52,6 @@ public class HexGrid : MonoBehaviour
         {
             HexMetrics.noiseSource = noiseSource;
             HexMetrics.InitializeHashGrid(seed); 
-            HexMetrics.colors = colors;
         }
         HexMetrics.solidFactor = innerHexProportion;
         HexMetrics.elevationStep = elevationStep;
@@ -69,7 +64,6 @@ public class HexGrid : MonoBehaviour
     {
         HexMetrics.noiseSource = noiseSource;
         HexMetrics.InitializeHashGrid(seed);
-        HexMetrics.colors = colors;
 
         HexMetrics.solidFactor = innerHexProportion;
 

@@ -62,12 +62,9 @@ public class HexCell : MonoBehaviour
     #region Color
 
     //Color
-    public Color Color {
-        get {
-            return HexMetrics.colors[terrainTypeIndex];
-        }
-    }
+
     int terrainTypeIndex;
+
     public int TerrainTypeIndex {
         get {
             return terrainTypeIndex;

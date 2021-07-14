@@ -175,6 +175,7 @@ MonoBehaviour:
   useColors: 0
   useUVCoordinates: 0
   useUV2Coordinates: 0
+  useTerrainTypes: 0
   flatTerraces: 0
   upwardTrisForSoloBottomTerrace: 0
 --- !u!1 &2430382039810050102
@@ -273,6 +274,7 @@ MonoBehaviour:
   useColors: 0
   useUVCoordinates: 1
   useUV2Coordinates: 0
+  useTerrainTypes: 0
   flatTerraces: 0
   upwardTrisForSoloBottomTerrace: 0
 --- !u!1 &3516067942533275042
@@ -451,6 +453,7 @@ MonoBehaviour:
   useColors: 1
   useUVCoordinates: 0
   useUV2Coordinates: 0
+  useTerrainTypes: 1
   flatTerraces: 0
   upwardTrisForSoloBottomTerrace: 0
 --- !u!1 &3516067942772402911
@@ -610,6 +613,7 @@ MonoBehaviour:
   useColors: 0
   useUVCoordinates: 1
   useUV2Coordinates: 0
+  useTerrainTypes: 0
   flatTerraces: 0
   upwardTrisForSoloBottomTerrace: 0
 --- !u!1 &7556570304517493792
@@ -708,6 +712,7 @@ MonoBehaviour:
   useColors: 0
   useUVCoordinates: 1
   useUV2Coordinates: 1
+  useTerrainTypes: 0
   flatTerraces: 0
   upwardTrisForSoloBottomTerrace: 0
 --- !u!1 &8018226857337722291
@@ -806,6 +811,7 @@ MonoBehaviour:
   useColors: 0
   useUVCoordinates: 0
   useUV2Coordinates: 0
+  useTerrainTypes: 0
   flatTerraces: 0
   upwardTrisForSoloBottomTerrace: 0
 --- !u!1 &8185376412337540078
@@ -904,5 +910,6 @@ MonoBehaviour:
   useColors: 0
   useUVCoordinates: 1
   useUV2Coordinates: 0
+  useTerrainTypes: 0
   flatTerraces: 0
   upwardTrisForSoloBottomTerrace: 0

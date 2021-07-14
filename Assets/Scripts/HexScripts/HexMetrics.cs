@@ -28,12 +28,6 @@ public class HexMetrics
 
     #endregion
 
-    #region Colors
-
-    public static Color[] colors;
-
-    #endregion
-
     #region Elevation
     // elevation
     public static float elevationStep = 2f;
